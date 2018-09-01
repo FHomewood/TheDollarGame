@@ -13,6 +13,8 @@ namespace TheDollarGame
         Texture2D vertTex;
         SpriteFont font;
         List<Vertex> vertexList = new List<Vertex>();
+
+        MouseState oldMState, newMState;
         int vertexNo = 5;
 
         public Main()
@@ -20,6 +22,7 @@ namespace TheDollarGame
             graphics = new GraphicsDeviceManager(this);
             graphics.PreferredBackBufferWidth = 600;
             graphics.PreferredBackBufferHeight = 600;
+            IsMouseVisible = true;
             Content.RootDirectory = "Content";
         }
         
@@ -27,7 +30,7 @@ namespace TheDollarGame
         {
             base.Initialize();
             Random rand = new Random();
-            
+            oldMState = Mouse.GetState();
             for (int i = 0; i < vertexNo;i++)
             {
                 vertexList.Add(new Vertex((byte)i, new Vector2(300,300) + 200 * new Vector2((float)Math.Cos(i * 2*Math.PI/vertexNo - Math.PI/2), (float)Math.Sin(i * 2 * Math.PI / vertexNo - Math.PI / 2))
@@ -50,7 +53,10 @@ namespace TheDollarGame
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
+            newMState = Mouse.GetState();
+            foreach (Vertex vertex in vertexList) vertex.Update(newMState,oldMState,vertexList);
 
+            oldMState = newMState;
             base.Update(gameTime);
         }
         
