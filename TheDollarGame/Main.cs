@@ -1,28 +1,45 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
+using System.Collections.Generic;
 
 namespace TheDollarGame
 {
     public class Main : Game
     {
         GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
+        SpriteBatch sB;
+        Texture2D vertTex;
+        SpriteFont font;
+        List<Vertex> vertexList = new List<Vertex>();
+        int vertexNo = 5;
 
         public Main()
         {
             graphics = new GraphicsDeviceManager(this);
+            graphics.PreferredBackBufferWidth = 600;
+            graphics.PreferredBackBufferHeight = 600;
             Content.RootDirectory = "Content";
         }
         
         protected override void Initialize()
         {
             base.Initialize();
+            Random rand = new Random();
+            
+            for (int i = 0; i < vertexNo;i++)
+            {
+                vertexList.Add(new Vertex((byte)i, new Vector2(300,300) + 200 * new Vector2((float)Math.Cos(i * 2*Math.PI/vertexNo - Math.PI/2), (float)Math.Sin(i * 2 * Math.PI / vertexNo - Math.PI / 2))
+                    , rand.Next(-3, 3), connectVertices(rand,i)));
+            }
         }
         
         protected override void LoadContent()
         {
-            spriteBatch = new SpriteBatch(GraphicsDevice);
+            sB = new SpriteBatch(GraphicsDevice);
+            vertTex = Content.Load<Texture2D>("White Button");
+            font = Content.Load<SpriteFont>("font");
         }
         
         protected override void UnloadContent()
@@ -37,12 +54,28 @@ namespace TheDollarGame
             base.Update(gameTime);
         }
         
+        private List<byte> connectVertices(Random rand, int vertexid)
+        {
+            List<byte> connectedverts = new List<byte>();
+            int connections = rand.Next(1, vertexNo - 2);
+            while (connections > 0)
+            {
+                int randvert = rand.Next(0, vertexNo);
+                if (randvert != vertexid) connectedverts.Add((byte)randvert);
+                connections--;
+            }
+            return connectedverts;
+        }
+
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.Black);
-            spriteBatch.Begin();
-
-            spriteBatch.End();
+            sB.Begin();
+            foreach(Vertex vertex in vertexList)
+            {
+                vertex.Draw(sB,vertTex,font,vertexList);
+            }
+            sB.End();
             base.Draw(gameTime);
         }
     }
