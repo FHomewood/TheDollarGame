@@ -15,29 +15,38 @@ namespace TheDollarGame
         private int value;
         private Color renderCol;
         private Vector2 location;
-        private List<byte> connections;
-        public Vertex(byte id,Vector2 location, int value, List<byte> connections)
+        public List<byte> connections;
+        public Vertex(byte id,Vector2 location, int value)
         {
             renderCol = Color.Red;
             this.id = id;
             this.location = location;
             this.value = value;
-            this.connections = connections;
+            this.connections = new List<byte>();
         }
 
         public void Update(MouseState newMState, MouseState oldMState, List<Vertex> list)
         {
-                // Clicked
+                // Left Clicked
                 if ((newMState.Position.ToVector2() - location).Length() < 20 &&
                  newMState.LeftButton == ButtonState.Pressed && 
                  oldMState.LeftButton == ButtonState.Released)
             {
                 renderCol = Color.DeepPink;
                 value -= connections.Count;
+                foreach (byte connect in connections) findVert(list, connect).value++;
+            }
+                // Right Clicked
+                else if ((newMState.Position.ToVector2() - location).Length() < 20 &&
+                 newMState.RightButton == ButtonState.Pressed &&
+                 oldMState.RightButton == ButtonState.Released)
+            {
+                renderCol = Color.DeepPink;
+                value += connections.Count;
                 foreach (byte connect in connections) findVert(list, connect).value--;
             }
-                //Hovered
-                else if ((newMState.Position.ToVector2() - location).Length() < 20)
+            //Hovered
+            else if ((newMState.Position.ToVector2() - location).Length() < 20)
             {
                 renderCol = Color.PaleVioletRed;
             }
@@ -52,10 +61,10 @@ namespace TheDollarGame
         {
             foreach(byte findid in connections)
             {
-                for(int i = 10; i < 60; i++)
+                for(int i = 10; i < 90; i++)
                 {
                     sB.Draw(vertTex,
-                        location + (findVert(vertList, findid).location - location) * i / 70
+                        location + (findVert(vertList, findid).location - location) * i / 100
                         ,null,Color.Gray,0f,vertTex.Bounds.Center.ToVector2(),0.01f,SpriteEffects.None,0f);
                 }
             }
